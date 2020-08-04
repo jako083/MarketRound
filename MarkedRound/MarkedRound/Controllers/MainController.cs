@@ -6,6 +6,7 @@ using MarkedRound.Model;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,35 +16,39 @@ namespace MarkedRound.Controllers
     [ApiController]
     public class MainController : ControllerBase
     {
-        public static IMongoCollection<BsonDocument> BsonCollection(string user, string pass, string section)
+        public static List<UserModel> GetAllUsers(int? id, string section)
         {
+            //Database Connection
+            IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
 
-            IMongoDatabase client = new MongoClient($"mongodb://{user}:{pass}@localhost:27017").GetDatabase("silkevejen");
-
-            return client.GetCollection<BsonDocument>(section);
-        }
-        public static List<List<UserClass>> testMethod()
-        {
-            //   BsonCollection("admin", "password", "Users");
-            IMongoDatabase client = new MongoClient($"mongodb://{"admin"}:{"password"}@localhost:27017").GetDatabase("silkevejen");
-
-            var userQuery = from c in client.GetCollection<UserClass>("Users").AsQueryable()
-                            select c;
-            var test = new List<List<UserClass>>();
-            foreach (UserClass output in userQuery)
+            //Collection Query
+            IMongoQueryable<UserModel> usageQuery;
+            if (id == null)
             {
-                List<UserClass> userClasses = new List<UserClass> { output };
-                test.Add(userClasses);
+                //Get all users if no id is specified
+                usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
+                                select c;
             }
-                return test;
+            else
+            {
+                //Get a specific user 
+                usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
+                             where c._id == id
+                            select c;
+            }
+
+            var ListOfUsers = new List<UserModel>();
+           
+
+            ListOfUsers.AddRange(usageQuery);
+                return ListOfUsers;
         }
 
-            // GET: api/<MainController>
+        // GET: api/<MainController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public ActionResult Get()
         {
-            testMethod();
-            return new string[] { "value12", "value2" };
+            return Ok(GetAllUsers(1, "Users"));
         }
 
         // GET api/<MainController>/5
