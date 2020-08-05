@@ -13,7 +13,7 @@ namespace MarkedRound.HelpClasses
         {
             try
             {
-                //DB
+                //Gets database then selects the collection called
                 IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
                 var BsonColl = client.GetCollection<BsonDocument>(collection);
 
