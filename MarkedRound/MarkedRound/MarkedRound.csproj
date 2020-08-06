@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="MongoDB.Bson" Version="2.11.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.0" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
 
 </Project>
