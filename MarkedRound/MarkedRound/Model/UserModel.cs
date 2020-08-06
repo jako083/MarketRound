@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace MarkedRound.Model
 {
     public class UserModel
     {
-        public UserModel(int id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, int?[] ongoingSales, int?[] salesHistory, int?[] reviews)
+        public UserModel(ObjectId id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, int?[] ongoingSales, int?[] salesHistory, int?[] reviews)
         {
             _id = id;
             Username = username;
@@ -24,7 +25,7 @@ namespace MarkedRound.Model
             Reviews = reviews;
         }
 
-        public int _id { get; set; }
+        public ObjectId _id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }

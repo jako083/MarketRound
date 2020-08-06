@@ -12,6 +12,10 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using static MarkedRound.HelpClasses.UpdateUser;
 using static MarkedRound.HelpClasses.CreateUser;
+using System.Net;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,24 +24,22 @@ using static MarkedRound.HelpClasses.CreateUser;
  * Exempel: ChangeUserInput(1, "PhoneNumber", null, 6666, "Users");
  * 
  */
-
-
-
-
 namespace MarkedRound.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class MainController : ControllerBase
     {
-        public static List<UserModel> GetAllUsers(int? id, string section)
+
+        public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
+        
+        public static List<UserModel> GetAllUsers(ObjectId? id, string section)
         {
             /* Azure connectionstring
              @"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?";
             */
                        
             //Database Connection
-               IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
 
             //Collection Query
             IMongoQueryable<UserModel> usageQuery;
@@ -63,22 +65,26 @@ namespace MarkedRound.Controllers
         [HttpGet]
         public ActionResult Get()
         {
-            return Ok(GetAllUsers(1, "Users"));
+            return Ok(GetAllUsers(null, "Users"));
         }
 
         // GET api/<MainController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public ActionResult Get(ObjectId id)
         {
-            return "value";
+            return Ok(GetAllUsers(id, "Users"));
         }
 
         // POST api/<MainController>
         [HttpPost]
-        public ActionResult Post([FromBody] UserModelFromPost user)
+        public ActionResult Post([FromBody] UserModel user)
         {
-            //Jobject maybe?
-      //      CreaUserSecton("Users", ;
+            //password hashing
+            user.Password = "YEs";
+
+            //pasword salting
+            user.Salt = "salt";
+                 CreaUserSecton("Users", user, client) ;
             return Ok("Test");
         }
 

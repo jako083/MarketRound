@@ -15,11 +15,11 @@ namespace MarkedRound.HelpClasses
     {
         public static bool CreaUserSecton(string StrCollection, UserModel user, IMongoDatabase client)
         {
-            try
-            {
+         //   try
+           // {
                 var newUser = new BsonDocument
                 {
-                    {"_id", user._id },
+                 //   {"_id", user._id },
                     {"Username", user.Username },
                     {"Password", user.Password },
                     {"Salt", user.Salt },
@@ -34,13 +34,14 @@ namespace MarkedRound.HelpClasses
                     {"Reviews", new BsonArray() }
                 };
                 var collection = client.GetCollection<BsonDocument>(StrCollection);
-            //    collection.InsertOne(newUser);
+                collection.InsertOne(newUser);
+                
                 return true;
-            }
+         /*   }
             catch
             {
                 return false;
-            }
+            }*/
         }
     }
 }
