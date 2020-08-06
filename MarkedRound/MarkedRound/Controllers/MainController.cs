@@ -80,10 +80,10 @@ namespace MarkedRound.Controllers
         public ActionResult Post([FromBody] UserModel user)
         {
             //password hashing
-            user.Password = "YEs";
+            user.password = "YEs";
 
             //pasword salting
-            user.Salt = "salt";
+            user.salt = "salt";
                  CreaUserSecton("Users", user, client) ;
             return Ok("Test");
         }

@@ -11,32 +11,32 @@ namespace MarkedRound.Model
         public UserModel(ObjectId id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, int?[] ongoingSales, int?[] salesHistory, int?[] reviews)
         {
             _id = id;
-            Username = username;
-            Password = password;
-            Salt = salt;
-            FirstName = firstName;
-            LastName = lastName;
-            PhoneNumber = phoneNumber;
-            Country = country;
-            City = city;
-            Address = address;
-            OngoingSales = ongoingSales;
-            SalesHistory = salesHistory;
-            Reviews = reviews;
+            this.username = username;
+            this.password = password;
+            this.salt = salt;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.phoneNumber = phoneNumber;
+            this.country = country;
+            this.city = city;
+            this.address = address;
+            this.ongoingSales = ongoingSales;
+            this.salesHistory = salesHistory;
+            this.reviews = reviews;
         }
 
         public ObjectId _id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Salt { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public int PhoneNumber { get; set; }
-        public string Country { get; set; }
-        public string City { get; set; }
-        public string Address { get; set; }
-        public int?[] OngoingSales { get; set; }
-        public int?[] SalesHistory { get; set; }
-        public int?[] Reviews { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
+        public string salt { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
+        public int phoneNumber { get; set; }
+        public string country { get; set; }
+        public string city { get; set; }
+        public string address { get; set; }
+        public int?[] ongoingSales { get; set; }
+        public int?[] salesHistory { get; set; }
+        public int?[] reviews { get; set; }
     }
 }

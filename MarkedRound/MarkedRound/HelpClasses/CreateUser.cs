@@ -20,18 +20,18 @@ namespace MarkedRound.HelpClasses
                 var newUser = new BsonDocument
                 {
                  //   {"_id", user._id },
-                    {"Username", user.Username },
-                    {"Password", user.Password },
-                    {"Salt", user.Salt },
-                    {"FirstName", user.FirstName },
-                    {"LastName", user.LastName },
-                    {"PhoneNumber", user.PhoneNumber },
-                    {"Country", user.Country },
-                    {"City", user.City },
-                    {"Address", user.Address },
-                    {"Ongoingsales", new BsonArray() },
-                    {"SalesHistory", new BsonArray() },
-                    {"Reviews", new BsonArray() }
+                    {"username", user.username },
+                    {"password", user.password },
+                    {"salt", user.salt },
+                    {"firstName", user.firstName },
+                    {"lastName", user.lastName },
+                    {"phoneNumber", user.phoneNumber },
+                    {"country", user.country },
+                    {"city", user.city },
+                    {"address", user.address },
+                    {"ongoingSales", new BsonArray() },
+                    {"salesHistory", new BsonArray() },
+                    {"reviews", new BsonArray() }
                 };
                 var collection = client.GetCollection<BsonDocument>(StrCollection);
                 collection.InsertOne(newUser);
