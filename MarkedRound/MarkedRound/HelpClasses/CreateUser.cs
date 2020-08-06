@@ -13,7 +13,7 @@ namespace MarkedRound.HelpClasses
 {
     public class CreateUser
     {
-        public static bool CreaUserSecton(string StrCollection, UserModel user, IMongoDatabase client)
+        public static bool CreateUserSecton(string StrCollection, UserModel user, IMongoDatabase client)
         {
          //   try
            // {

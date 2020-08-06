@@ -84,7 +84,8 @@ namespace MarkedRound.Controllers
 
             //pasword salting
             user.salt = "salt";
-                 CreaUserSecton("Users", user, client) ;
+            CreateUserSecton("Users", user, client) ;
+            
             return Ok("Test");
         }
 
