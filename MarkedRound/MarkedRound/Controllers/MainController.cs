@@ -16,6 +16,7 @@ using System.Net;
 using MongoDB.Bson.IO;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,6 +24,7 @@ using Newtonsoft.Json;
  * Update Method:  ChangeUserInput(id, Document, StrInput, IntInput, collection)
  * Exempel: ChangeUserInput(1, "PhoneNumber", null, 6666, "Users");
  * 
+ * Add new User method: CreateUserSecton(Collection, UserModel, DBClient);
  */
 namespace MarkedRound.Controllers
 {
@@ -30,16 +32,15 @@ namespace MarkedRound.Controllers
     [ApiController]
     public class MainController : ControllerBase
     {
-
+        //Database Connection
         public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
-        
+
         public static List<UserModel> GetAllUsers(ObjectId? id, string section)
         {
             /* Azure connectionstring
              @"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?";
             */
-                       
-            //Database Connection
+
 
             //Collection Query
             IMongoQueryable<UserModel> usageQuery;
@@ -47,14 +48,14 @@ namespace MarkedRound.Controllers
             {
                 //Get all users if no id is specified
                 usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
-                                select c;
+                             select c;
             }
             else
             {
                 //Get a specific user 
                 usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
                              where c._id == id
-                            select c;
+                             select c;
             }
             var ListOfUsers = new List<UserModel>();
             ListOfUsers.AddRange(usageQuery);
@@ -84,8 +85,7 @@ namespace MarkedRound.Controllers
 
             //pasword salting
             user.salt = "salt";
-            CreateUserSecton("Users", user, client) ;
-            
+            CreateUserSecton("Users", user, client);
             return Ok("Test");
         }
 
@@ -96,9 +96,14 @@ namespace MarkedRound.Controllers
         }
 
         // DELETE api/<MainController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete]
+        public ActionResult Delete([FromBody] string id)
         {
+            var collection = client.GetCollection<BsonDocument>("Users");
+            var deletefilter = Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id));
+
+            collection.DeleteOne(deletefilter);
+            return Ok("Success");
         }
     }
 }
