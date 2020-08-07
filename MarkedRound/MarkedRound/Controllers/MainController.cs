@@ -35,7 +35,7 @@ namespace MarkedRound.Controllers
         //Database Connection
         public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
 
-        public static List<UserModel> GetAllUsers(ObjectId? id, string section)
+        public static List<UserModel> GetAllUsers(string username, string section)
         {
             /* Azure connectionstring
              @"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?";
@@ -44,7 +44,7 @@ namespace MarkedRound.Controllers
 
             //Collection Query
             IMongoQueryable<UserModel> usageQuery;
-            if (id == null)
+            if (username == null)
             {
                 //Get all users if no id is specified
                 usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
@@ -54,7 +54,7 @@ namespace MarkedRound.Controllers
             {
                 //Get a specific user 
                 usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
-                             where c._id == id
+                             where c.username == username
                              select c;
             }
             var ListOfUsers = new List<UserModel>();
@@ -70,10 +70,10 @@ namespace MarkedRound.Controllers
         }
 
         // GET api/<MainController>/5
-        [HttpGet("{id}")]
-        public ActionResult Get(ObjectId id)
+        [HttpGet("{username}")]
+        public ActionResult Get(string username)
         {
-            return Ok(GetAllUsers(id, "Users"));
+            return Ok(GetAllUsers(username, "Users"));
         }
 
         // POST api/<MainController>
@@ -90,17 +90,42 @@ namespace MarkedRound.Controllers
         }
 
         // PUT api/<MainController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public ActionResult Put([FromBody] ChangeUserModel changeUser)
         {
+            if (changeUser.key.Length != changeUser.change.Length || changeUser.dataType.Length != changeUser.key.Length)
+                return Ok("Missing Input");
+
+            try
+            {
+                for (int i = 0; i < changeUser.key.Length; i++)
+                {
+                    switch (changeUser.dataType[i])
+                    {
+                        case "string":
+                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null);
+                            break;
+                        case "int":
+                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                    return Ok("Success");
+            }
+            catch
+            {
+                return Ok("Error");
+            }
         }
 
         // DELETE api/<MainController>/5
-        [HttpDelete]
-        public ActionResult Delete([FromBody] string id)
+        [HttpDelete("{username}")]
+        public ActionResult Delete(string username)
         {
             var collection = client.GetCollection<BsonDocument>("Users");
-            var deletefilter = Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id));
+            var deletefilter = Builders<BsonDocument>.Filter.Eq("username", username);
 
             collection.DeleteOne(deletefilter);
             return Ok("Success");

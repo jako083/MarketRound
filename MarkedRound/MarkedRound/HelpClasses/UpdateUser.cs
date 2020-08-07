@@ -9,16 +9,19 @@ namespace MarkedRound.HelpClasses
 {
     public class UpdateUser
     {
-        public static bool ChangeUserInput(int id, string Document, string StrInput, int? IntInput, string collection)
+        public static bool ChangeUserInput(string username, string collection, string Document, string StrInput, int? IntInput)
         {
             try
             {
                 //Gets database then selects the collection called
                 IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
+                
+                //Collection to edit
                 var BsonColl = client.GetCollection<BsonDocument>(collection);
 
-                //Section for changing users input on DB
-                FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("_id", id);
+                //Filter for changes
+                FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("username", username);
+                
                 UpdateDefinition<BsonDocument> update;
                 if (StrInput != null)
                 {
