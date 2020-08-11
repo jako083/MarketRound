@@ -10,15 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using static MarkedRound.HelpClasses.UpdateUser;
-using static MarkedRound.HelpClasses.CreateUser;
 using System.Net;
 using MongoDB.Bson.IO;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using static MarkedRound.HelpClasses.UpdateUser;
+using static MarkedRound.HelpClasses.CreateUser;
+using static MarkedRound.HelpClasses.LoginClasses;
+
+//TODO
+//Change add new user function, add new arrays to it for login sessions
+//regex for security?
+//___________________________________________________________________________________________
 
 /*Notes:
  * Update Method:  ChangeUserInput(id, Document, StrInput, IntInput, collection)
@@ -80,13 +86,26 @@ namespace MarkedRound.Controllers
         [HttpPost]
         public ActionResult Post([FromBody] UserModel user)
         {
-            //password hashing
-            user.password = "YEs";
+            //issue: for some reason, database saves logintries input wrong, with 2 hours behind in time
 
-            //pasword salting
-            user.salt = "salt";
-            CreateUserSecton("Users", user, client);
-            return Ok("Test");
+            if (user.firstName == null && user.country == null)
+            {
+                //checks if parts of the value is null, to then determind if its create user or login
+                var dbUser = GetAllUsers(user.username, "Users");
+                return Ok(login(user, dbUser));
+            }
+            else
+            {
+                //create user
+                user.salt = "salt";
+                var result = CreateUserSecton("Users", user, client);
+                if (result != "Success")
+                {
+                    //Exception error
+                    return Ok(result);
+                }
+                return Ok();
+             }
         }
 
         // PUT api/<MainController>/5
@@ -103,10 +122,10 @@ namespace MarkedRound.Controllers
                     switch (changeUser.dataType[i])
                     {
                         case "string":
-                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null);
+                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null);
                             break;
                         case "int":
-                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]));
+                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null);
                             break;
                         default:
                             break;

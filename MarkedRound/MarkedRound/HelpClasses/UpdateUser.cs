@@ -9,7 +9,7 @@ namespace MarkedRound.HelpClasses
 {
     public class UpdateUser
     {
-        public static bool ChangeUserInput(string username, string collection, string Document, string StrInput, int? IntInput)
+        public static bool ChangeUserInput(string username, string collection, string Document, string StrInput, int? IntInput, List<DateTime> failedLoginAttemps, DateTime? loginBan)
         {
             try
             {
@@ -27,6 +27,11 @@ namespace MarkedRound.HelpClasses
                 {
                     // Used for when a string value is given
                     update = Builders<BsonDocument>.Update.Set(Document, StrInput);
+                }
+                else if (failedLoginAttemps != null)
+                {
+                    // Used for failed login attempts
+                    update = Builders<BsonDocument>.Update.Set(Document, failedLoginAttemps);
                 }
                 else
                 {

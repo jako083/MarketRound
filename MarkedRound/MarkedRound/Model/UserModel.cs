@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace MarkedRound.Model
 {
     public class UserModel
     {
-        public UserModel(ObjectId id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, int?[] ongoingSales, int?[] salesHistory, int?[] reviews)
+        public UserModel(ObjectId id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, int?[] ongoingSales, int?[] salesHistory, int?[] reviews, List<DateTime> failedLoginAttempts, string loginBan, DateTime creationDate)
         {
             _id = id;
             this.username = username;
@@ -23,6 +24,9 @@ namespace MarkedRound.Model
             this.ongoingSales = ongoingSales;
             this.salesHistory = salesHistory;
             this.reviews = reviews;
+            this.failedLoginAttempts = failedLoginAttempts;
+            this.loginBan = loginBan;
+            this.creationDate = creationDate;
         }
 
         public ObjectId _id { get; set; }
@@ -38,5 +42,9 @@ namespace MarkedRound.Model
         public int?[] ongoingSales { get; set; }
         public int?[] salesHistory { get; set; }
         public int?[] reviews { get; set; }
+        public List<DateTime> failedLoginAttempts {get;set;}
+        public string loginBan { get; set; }
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        public DateTime creationDate { get; set; }
     }
 }

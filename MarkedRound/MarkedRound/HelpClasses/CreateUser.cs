@@ -8,21 +8,23 @@ using System.Net;
 using Newtonsoft.Json;
 using MarkedRound.Model;
 using MongoDB.Driver;
+using static MarkedRound.HelpClasses.HashingSalting;
 
 namespace MarkedRound.HelpClasses
 {
     public class CreateUser
     {
-        public static bool CreateUserSecton(string StrCollection, UserModel user, IMongoDatabase client)
+        public static string CreateUserSecton(string StrCollection, UserModel user, IMongoDatabase client)
         {
-         //   try
-           // {
+               try
+               {
+            var Hashsalt = HashSaltValues(user.password, null);
+            var currentTime = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
                 var newUser = new BsonDocument
                 {
-                 //   {"_id", user._id },
                     {"username", user.username },
-                    {"password", user.password },
-                    {"salt", user.salt },
+                    {"password", Hashsalt.Pass },
+                    {"salt", Hashsalt.Salt },
                     {"firstName", user.firstName },
                     {"lastName", user.lastName },
                     {"phoneNumber", user.phoneNumber },
@@ -31,17 +33,20 @@ namespace MarkedRound.HelpClasses
                     {"address", user.address },
                     {"ongoingSales", new BsonArray() },
                     {"salesHistory", new BsonArray() },
-                    {"reviews", new BsonArray() }
+                    {"reviews", new BsonArray() },
+                    {"failedLoginAttempts", new BsonArray() },
+                    {"loginBan", ""},
+                    {"creationDate", currentTime}
                 };
                 var collection = client.GetCollection<BsonDocument>(StrCollection);
                 collection.InsertOne(newUser);
                 
-                return true;
-         /*   }
-            catch
+                return "Success";
+            }
+            catch (ArgumentException e)
             {
-                return false;
-            }*/
+                return e.Message;
+            }
         }
     }
 }
