@@ -6,11 +6,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Net;
 using Newtonsoft.Json;
-using MarkedRound.Model;
+using MarketRound.Model;
 using MongoDB.Driver;
-using static MarkedRound.HelpClasses.HashingSalting;
+using static MarketRound.HelpClasses.HashingSalting;
 
-namespace MarkedRound.HelpClasses
+namespace MarketRound.HelpClasses
 {
     public class CreateUser
     {

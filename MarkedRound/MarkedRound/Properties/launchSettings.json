@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "MarkedRound": {
+    "MarketRound": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/Main",

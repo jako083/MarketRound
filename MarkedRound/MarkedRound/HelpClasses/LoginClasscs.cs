@@ -1,12 +1,12 @@
-﻿using MarkedRound.Model;
+﻿using MarketRound.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static MarkedRound.HelpClasses.UpdateUser;
-using static MarkedRound.HelpClasses.HashingSalting;
+using static MarketRound.HelpClasses.UpdateUser;
+using static MarketRound.HelpClasses.HashingSalting;
 
-namespace MarkedRound.HelpClasses
+namespace MarketRound.HelpClasses
 {
     public class LoginClasses
     {
@@ -47,7 +47,7 @@ namespace MarkedRound.HelpClasses
                             //Matches the hashed password value with the one saved in the DB
                             if (dbUser[0].password == HashSaltBase64.Pass)
                             {
-                                return "Successfull Login";
+                                return "Successful Login";
                             }
                             else
                             {

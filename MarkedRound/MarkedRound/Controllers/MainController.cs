@@ -4,8 +4,8 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Threading.Tasks;
-using MarkedRound.HelpClasses;
-using MarkedRound.Model;
+using MarketRound.HelpClasses;
+using MarketRound.Model;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -17,13 +17,15 @@ using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
-using static MarkedRound.HelpClasses.UpdateUser;
-using static MarkedRound.HelpClasses.CreateUser;
-using static MarkedRound.HelpClasses.LoginClasses;
+using static MarketRound.HelpClasses.UpdateUser;
+using static MarketRound.HelpClasses.CreateUser;
+using static MarketRound.HelpClasses.LoginClasses;
+using MarkedRound.Model;
 
 //TODO
-//Change add new user function, add new arrays to it for login sessions
+//isnullorempty
 //regex for security?
+//Try catches?
 //___________________________________________________________________________________________
 
 /*Notes:
@@ -32,7 +34,7 @@ using static MarkedRound.HelpClasses.LoginClasses;
  * 
  * Add new User method: CreateUserSecton(Collection, UserModel, DBClient);
  */
-namespace MarkedRound.Controllers
+namespace MarketRound.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -84,28 +86,24 @@ namespace MarkedRound.Controllers
 
         // POST api/<MainController>
         [HttpPost]
-        public ActionResult Post([FromBody] UserModel user)
+        public ActionResult Post([FromBody] Usermodel_Post user)
         {
-            //issue: for some reason, database saves logintries input wrong, with 2 hours behind in time
-
-            if (user.firstName == null && user.country == null)
+            switch (user.section)
             {
-                //checks if parts of the value is null, to then determind if its create user or login
-                var dbUser = GetAllUsers(user.username, "Users");
-                return Ok(login(user, dbUser));
+                case "createUser":
+                    var result = CreateUserSecton("Users", user.userContent, client);
+                    if (result != "Success")
+                    {
+                        //Exception error
+                        return Ok(result);
+                    }
+                    return Ok();
+                case "login":
+                    // Example: https://gyazo.com/ceb108a3cf4755b641828e5d445b152c
+                    var dbUser = GetAllUsers(user.userContent.username, "Users");
+                    return Ok(login(user.userContent, dbUser));
             }
-            else
-            {
-                //create user
-                user.salt = "salt";
-                var result = CreateUserSecton("Users", user, client);
-                if (result != "Success")
-                {
-                    //Exception error
-                    return Ok(result);
-                }
-                return Ok();
-             }
+            return Ok("Error, invalid Section detected!");
         }
 
         // PUT api/<MainController>/5
@@ -114,24 +112,24 @@ namespace MarkedRound.Controllers
         {
             if (changeUser.key.Length != changeUser.change.Length || changeUser.dataType.Length != changeUser.key.Length)
                 return Ok("Missing Input");
-
             try
             {
+                var result = false;
                 for (int i = 0; i < changeUser.key.Length; i++)
                 {
                     switch (changeUser.dataType[i])
                     {
                         case "string":
-                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null);
+                          result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null);
                             break;
                         case "int":
-                            ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null);
+                        result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null);
                             break;
                         default:
                             break;
                     }
                 }
-                    return Ok("Success");
+                    return Ok(result);
             }
             catch
             {

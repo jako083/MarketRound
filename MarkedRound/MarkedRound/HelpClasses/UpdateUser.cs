@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MarkedRound.HelpClasses
+namespace MarketRound.HelpClasses
 {
     public class UpdateUser
     {
