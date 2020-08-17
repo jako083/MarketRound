@@ -35,9 +35,13 @@ namespace MarkedRound.Controllers
                              where c._id == ObjectId.Parse(_id)
                              select c;
             }
+
+
+
             liste.AddRange(usageQuery);
             return liste;
         }
+
 
         [HttpGet]
         public ActionResult Get()
@@ -56,6 +60,10 @@ namespace MarkedRound.Controllers
                     var Matches = products.Where(x => x.title.Contains(content.input.search, StringComparison.CurrentCultureIgnoreCase)
                                          || x.description.Contains(content.input.search, StringComparison.CurrentCultureIgnoreCase)
                                          || x.tags.Contains(content.input.search, StringComparer.OrdinalIgnoreCase)).ToList();
+                    if(content.AdvancedSearch != null)
+                    {
+                        Matches = AdvancedSearch(Matches, content.AdvancedSearch);
+                    }
                     return Ok(Matches);
                 case "Test":
                     //Add more cases here when given
@@ -63,5 +71,13 @@ namespace MarkedRound.Controllers
             }
             return Ok();
         }
+
+
+        public List<ProductModel> AdvancedSearch(List<ProductModel> list, AdvancedSearchModel SearchOptions)
+        {
+            //add search options here
+            return list;
+        }
+
     }
 }
