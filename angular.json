@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "MarketRound-app": {
+    "MarketRound": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/MarketRound-app",
+            "outputPath": "dist/MarketRound",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -24,6 +24,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -62,18 +63,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "MarketRound-app:build"
+            "browserTarget": "MarketRound:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "MarketRound-app:build:production"
+              "browserTarget": "MarketRound:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "MarketRound-app:build"
+            "browserTarget": "MarketRound:build"
           }
         },
         "test": {
@@ -88,6 +89,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -110,15 +112,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "MarketRound-app:serve"
+            "devServerTarget": "MarketRound:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "MarketRound-app:serve:production"
+              "devServerTarget": "MarketRound:serve:production"
             }
           }
         }
       }
-    }},
-  "defaultProject": "MarketRound-app"
+    }
+  },
+  "defaultProject": "MarketRound"
 }
