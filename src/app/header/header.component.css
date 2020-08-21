@@ -28,6 +28,12 @@
   text-decoration: none;
 }
 
+.mat-sidenav-content h2 {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 30px;
+}
+
 @media (min-width: 768px) {
   .sidenav {
     display: none;

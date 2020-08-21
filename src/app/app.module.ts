@@ -15,13 +15,17 @@ import { SearchBoxComponent } from './search-box/search-box.component';
 import {MatInputModule} from '@angular/material/input';
 import {MatDialogModule} from '@angular/material/dialog';
 import { LoginComponent } from './login/login.component';
+import {MatCardModule} from '@angular/material/card';
+import { LatestProductsComponent } from './latest-products/latest-products.component';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     SearchBoxComponent,
-    LoginComponent
+    LoginComponent,
+    LatestProductsComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +38,9 @@ import { LoginComponent } from './login/login.component';
     MatIconModule,
     MatListModule,
     MatInputModule,
-    MatDialogModule
+    MatDialogModule,
+    MatCardModule,
+    MatGridListModule
   ],
   providers: [],
   bootstrap: [AppComponent]
