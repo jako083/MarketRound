@@ -1,0 +1,8 @@
+mat-grid-tile {
+    background: lightblue;
+  }
+
+  mat-grid-list {
+    width: 80%;
+    margin: 20px auto;
+  }
