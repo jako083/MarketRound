@@ -43,45 +43,56 @@ namespace MarketRound.Controllers
         //Database Connection
         public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
 
-        public static List<UserModel> GetAllUsers(string username, string section)
+        public static async Task<List<UserModel>> GetAllUsers(string username, string section)
+       // public static List<UserModel> GetAllUsers(string username, string section)
         {
             /* Azure connectionstring
              @"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?";
             */
-
-
             //Collection Query
-            IMongoQueryable<UserModel> usageQuery;
-            if (username == null)
+            try
             {
-                //Get all users if no id is specified
-                usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
-                             select c;
+                var ListOfUsers = new List<UserModel>();
+                await Task.Run(() =>
+                {
+
+                    IMongoQueryable<UserModel> usageQuery;
+                    if (username == null)
+                    {
+                        //Get all users if no id is specified
+                        usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
+                                     select c;
+                    }
+                    else
+                    {
+                        //Get a specific user 
+                        usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
+                                     where c.username == username
+                                     select c;
+                    }
+                    ListOfUsers.AddRange(usageQuery);
+                });
+                return ListOfUsers;
+
             }
-            else
+            catch
             {
-                //Get a specific user 
-                usageQuery = from c in client.GetCollection<UserModel>(section).AsQueryable()
-                             where c.username == username
-                             select c;
+                return null;
             }
-            var ListOfUsers = new List<UserModel>();
-            ListOfUsers.AddRange(usageQuery);
-            return ListOfUsers;
         }
 
         // GET: api/<MainController>
         [HttpGet]
         public ActionResult Get()
         {
-            return Ok(GetAllUsers(null, "Users"));
+            return Ok(GetAllUsers(null, "Users").Result);
         }
 
         // GET api/<MainController>/5
         [HttpGet("{username}")]
         public ActionResult Get(string username)
         {
-            return Ok(GetAllUsers(username, "Users"));
+            return Ok(GetAllUsers(username, "Users").Result);
         }
 
         // POST api/<MainController>
@@ -97,13 +108,14 @@ namespace MarketRound.Controllers
                         //Exception error
                         return Ok(result);
                     }
-                    return Ok();
+                    return Ok(result);
                 case "login":
                     // Example: https://gyazo.com/ceb108a3cf4755b641828e5d445b152c
                     var dbUser = GetAllUsers(user.userContent.username, "Users");
-                    return Ok(login(user.userContent, dbUser));
+                    return Ok(login(user.userContent, dbUser.Result));
+                default:
+                    return Ok("Error! Null / Empty / Non existing section detected");
             }
-            return Ok("Error, invalid Section detected!");
         }
 
         // PUT api/<MainController>/5
@@ -120,16 +132,16 @@ namespace MarketRound.Controllers
                     switch (changeUser.dataType[i])
                     {
                         case "string":
-                          result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null);
+                            result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null);
                             break;
                         case "int":
-                        result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null);
+                            result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null);
                             break;
                         default:
                             break;
                     }
                 }
-                    return Ok(result);
+                return Ok(result);
             }
             catch
             {
@@ -141,11 +153,17 @@ namespace MarketRound.Controllers
         [HttpDelete("{username}")]
         public ActionResult Delete(string username)
         {
-            var collection = client.GetCollection<BsonDocument>("Users");
-            var deletefilter = Builders<BsonDocument>.Filter.Eq("username", username);
+            try {
+                var collection = client.GetCollection<BsonDocument>("Users");
+                var deletefilter = Builders<BsonDocument>.Filter.Eq("username", username);
 
-            collection.DeleteOne(deletefilter);
-            return Ok("Success");
+                collection.DeleteOne(deletefilter);
+                return Ok("Success");
+            }
+            catch
+            {
+                return Ok("Error, delete action could not be completed");
+            }
         }
     }
 }

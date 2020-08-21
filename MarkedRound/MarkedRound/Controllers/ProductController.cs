@@ -75,7 +75,30 @@ namespace MarkedRound.Controllers
 
         public List<ProductModel> AdvancedSearch(List<ProductModel> list, AdvancedSearchModel SearchOptions)
         {
+            //Alternatively use a switch?
+
             //add search options here
+            if(SearchOptions.PriceRange == true)
+            {
+                list.RemoveAll(x => x.price > SearchOptions.PriceRangeHigh || x.price < SearchOptions.PriceRangeLow);
+            }
+            if(SearchOptions.HighToLow == true)
+            {
+                list = list.OrderByDescending(x => x.price).ToList();
+            }
+            if(SearchOptions.LowToHigh == true)
+            {
+                list = list.OrderBy(x => x.price).ToList();
+            }
+            if(SearchOptions.AlphabeticalOrder == true)
+            {
+                list = list.OrderBy(x => x.title).ToList();
+            }
+            if (SearchOptions.ShowNewest)
+            {
+                //Sell date start
+            }
+
             return list;
         }
 
