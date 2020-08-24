@@ -1,0 +1,21 @@
+.mat-card {
+  height: 25rem;
+
+}
+
+.mat-card-title {
+  text-align: center;
+  font-size: 30px;
+}
+
+.mat-form-field {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.search-field {
+    width: 60%;
+    margin: 20px auto;
+  }

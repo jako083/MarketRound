@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'MarketRound-app';
+  title = 'MarketRound';
+
+
+
 }
