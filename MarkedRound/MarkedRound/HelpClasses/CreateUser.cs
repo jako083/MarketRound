@@ -19,7 +19,7 @@ namespace MarketRound.HelpClasses
         {
                try
                {
-                Encryptor _encrypter = new Encryptor("4556-4845-4852-9632");
+                Encryptor _encrypter = new Encryptor("4556484548529632");
                 var Hashsalt = HashSaltValues(user.password, null);
                 user.password = Hashsalt.Pass;
                 var EncryptedUser =_encrypter.ObjectToEncryptDecrypt(user, Hashsalt.Salt, "Encrypt");

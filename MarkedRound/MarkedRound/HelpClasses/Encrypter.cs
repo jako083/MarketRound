@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MarkedRound.HelpClasses
@@ -21,7 +22,7 @@ namespace MarkedRound.HelpClasses
             if (string.IsNullOrEmpty(salt))
                 throw new NullReferenceException();
 
-            this._salt = Encoding.Unicode.GetBytes(salt);
+            this._salt = Convert.FromBase64String(salt);
 
             _algorithm = new AesManaged();
             _algorithm.Padding = PaddingMode.Zeros;
@@ -32,35 +33,54 @@ namespace MarkedRound.HelpClasses
             var liste = new List<Task>();
             UserModel encryptedUser = user;
             //    encryptedUser.username = Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.username), saltPass)).Result);
-            Kryption kryption = new Kryption();
-
             if (section == "Encrypt")
             {
-               encryptedUser.username =           Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.username), saltPass)).Result);
-               encryptedUser.password =           Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.password), saltPass)).Result);
-               encryptedUser.firstName =          Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.firstName), saltPass)).Result);
-               encryptedUser.lastName  =          Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.lastName), saltPass)).Result);
-               encryptedUser.country   =          Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.country), saltPass)).Result);
-               encryptedUser.city     =           Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.city), saltPass)).Result);
-               encryptedUser.address =            Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.address), saltPass)).Result);
+              // var testes1 = Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.username), saltPass) );
+               var testes1 = Task.Run(() => Encrypt(Encoding.UTF8.GetBytes(user.username), saltPass) );
+               
+               var testes2 = Task.Run(() => Encrypt(Encoding.UTF8.GetBytes(user.password), saltPass) );
+               var testes3 = Task.Run(() => Encrypt(Encoding.UTF8.GetBytes(user.firstName), saltPass));
+               var testes4 = Task.Run(() => Encrypt(Encoding.UTF8.GetBytes(user.lastName), saltPass) );
+               var testes5 = Task.Run(() => Encrypt(Encoding.UTF8.GetBytes(user.country), saltPass)  );
+               var testes6 = Task.Run(() => Encrypt(Encoding.UTF8.GetBytes(user.city), saltPass)     );
+               var testes7 = Task.Run(() => Encrypt(Encoding.UTF8.GetBytes(user.address), saltPass)  );
+                
+                Task.WaitAll();
+               encryptedUser.username =           Convert.ToBase64String(testes1.Result);
+                
+               encryptedUser.password =           Convert.ToBase64String(testes2.Result);
+               encryptedUser.firstName =          Convert.ToBase64String(testes3.Result);
+               encryptedUser.lastName  =          Convert.ToBase64String(testes4.Result);
+               encryptedUser.country   =          Convert.ToBase64String(testes5.Result);
+               encryptedUser.city     =           Convert.ToBase64String(testes6.Result);
+               encryptedUser.address =            Convert.ToBase64String(testes7.Result);
+                
             }
             else
             {
                
                 //testing phase
-                var test = Encoding.Unicode.GetBytes(user.lastName);
+                var test = Convert.FromBase64String(user.lastName);
                var testing = Decrypt(test, saltPass).Result;
-                var testing2 = Encoding.Unicode.GetString(testing);
+                var testing2 = Convert.ToBase64String(testing);
 
-
+                var testes1 = Task.Run(() => Decrypt(Convert.FromBase64String(user.username), saltPass))  ;
                 
-                encryptedUser.username =          Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.username), saltPass)).Result);
-                encryptedUser.password =          Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.password), saltPass)).Result);
-                encryptedUser.firstName =         Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.firstName), saltPass)).Result);
-                encryptedUser.lastName =          Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.lastName), saltPass)).Result);
-                encryptedUser.country =           Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.country), saltPass)).Result);
-                encryptedUser.city =              Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.city), saltPass)).Result);
-                encryptedUser.address =           Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.address), saltPass)).Result);
+                var testes2 = Task.Run(() => Decrypt(Convert.FromBase64String(user.password), saltPass))  ;
+                var testes3 = Task.Run(() => Decrypt(Convert.FromBase64String(user.firstName), saltPass)) ;
+                var testes4 = Task.Run(() => Decrypt(Convert.FromBase64String(user.lastName), saltPass))  ;
+                var testes5 = Task.Run(() => Decrypt(Convert.FromBase64String(user.country), saltPass))   ;
+                var testes6 = Task.Run(() => Decrypt(Convert.FromBase64String(user.city), saltPass))      ;
+                var testes7 = Task.Run(() => Decrypt(Convert.FromBase64String(user.address), saltPass))   ;
+                
+                Task.WaitAll();
+                encryptedUser.username =  Regex.Replace(Encoding.UTF8.GetString(testes1.Result), @"(\u0000)+$", "");
+                encryptedUser.password =  Regex.Replace(Encoding.UTF8.GetString(testes2.Result), @"(\u0000)+$", "");
+                encryptedUser.firstName = Regex.Replace(Encoding.UTF8.GetString(testes3.Result), @"(\u0000)+$", "");
+                encryptedUser.lastName =  Regex.Replace(Encoding.UTF8.GetString(testes4.Result), @"(\u0000)+$", "");
+                encryptedUser.country =   Regex.Replace(Encoding.UTF8.GetString(testes5.Result), @"(\u0000)+$", "");
+                encryptedUser.city =      Regex.Replace(Encoding.UTF8.GetString(testes6.Result), @"(\u0000)+$", "");
+                encryptedUser.address =   Regex.Replace(Encoding.UTF8.GetString(testes7.Result), @"(\u0000)+$", "");
                 
             }
             Task.WaitAll();

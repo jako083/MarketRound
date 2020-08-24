@@ -72,7 +72,7 @@ namespace MarketRound.Controllers
                                      where c.username == username
                                      select c;
                     }
-                    Encryptor _encrypter = new Encryptor("4556-4845-4852-9632");
+                    Encryptor _encrypter = new Encryptor("4556484548529632");
 
                     foreach (var item in usageQuery)
                     {
