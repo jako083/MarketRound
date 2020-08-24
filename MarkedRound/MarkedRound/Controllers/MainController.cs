@@ -21,6 +21,8 @@ using static MarketRound.HelpClasses.UpdateUser;
 using static MarketRound.HelpClasses.CreateUser;
 using static MarketRound.HelpClasses.LoginClasses;
 using MarkedRound.Model;
+using MarkedRound.HelpClasses;
+using System.Text;
 
 //TODO
 //isnullorempty
@@ -70,7 +72,16 @@ namespace MarketRound.Controllers
                                      where c.username == username
                                      select c;
                     }
-                    ListOfUsers.AddRange(usageQuery);
+                    Encryptor _encrypter = new Encryptor("4556-4845-4852-9632");
+
+                    foreach (var item in usageQuery)
+                    {
+                        //    var encrypt = Task.Run(() => _encrypter.Encrypt(Encoding.Default.GetBytes(item);
+                        var test = _encrypter.ObjectToEncryptDecrypt(item, item.salt, "Decrypt");
+                      ListOfUsers.Add( test);
+
+                    }
+                 //   ListOfUsers.AddRange(usageQuery);
                 });
                 return ListOfUsers;
 

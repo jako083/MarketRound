@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MarkedRound.Model;
+using MarketRound.Model;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +13,6 @@ namespace MarkedRound.HelpClasses
 {
     class Encryptor : IDisposable
     {
-
         #region symmetric 
         byte[] _salt;
         AesManaged _algorithm;
@@ -22,19 +23,67 @@ namespace MarkedRound.HelpClasses
 
             this._salt = Encoding.Unicode.GetBytes(salt);
 
-            // TODO: 01: Instantiate the _algorithm object.
             _algorithm = new AesManaged();
+            _algorithm.Padding = PaddingMode.Zeros;
+         //   _algorithm.Mode = CipherMode.CBC;
         }
+        public UserModel ObjectToEncryptDecrypt(UserModel user, string saltPass, string section)
+        {
+            var liste = new List<Task>();
+            UserModel encryptedUser = user;
+            //    encryptedUser.username = Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.username), saltPass)).Result);
+            Kryption kryption = new Kryption();
+
+            if (section == "Encrypt")
+            {
+               encryptedUser.username =           Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.username), saltPass)).Result);
+               encryptedUser.password =           Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.password), saltPass)).Result);
+               encryptedUser.firstName =          Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.firstName), saltPass)).Result);
+               encryptedUser.lastName  =          Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.lastName), saltPass)).Result);
+               encryptedUser.country   =          Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.country), saltPass)).Result);
+               encryptedUser.city     =           Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.city), saltPass)).Result);
+               encryptedUser.address =            Encoding.Unicode.GetString(Task.Run(() => Encrypt(Encoding.Unicode.GetBytes(user.address), saltPass)).Result);
+            }
+            else
+            {
+               
+                //testing phase
+                var test = Encoding.Unicode.GetBytes(user.lastName);
+               var testing = Decrypt(test, saltPass).Result;
+                var testing2 = Encoding.Unicode.GetString(testing);
+
+
+                
+                encryptedUser.username =          Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.username), saltPass)).Result);
+                encryptedUser.password =          Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.password), saltPass)).Result);
+                encryptedUser.firstName =         Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.firstName), saltPass)).Result);
+                encryptedUser.lastName =          Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.lastName), saltPass)).Result);
+                encryptedUser.country =           Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.country), saltPass)).Result);
+                encryptedUser.city =              Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.city), saltPass)).Result);
+                encryptedUser.address =           Encoding.Unicode.GetString(Task.Run(() => Decrypt(Encoding.Unicode.GetBytes(user.address), saltPass)).Result);
+                
+            }
+            Task.WaitAll();
+            /*
+            encryptedUser.username  = Encoding.Unicode.GetString(taskUser.Result);
+            encryptedUser.password  = Encoding.Unicode.GetString(taskPass.Result);
+            encryptedUser.firstName = Encoding.Unicode.GetString(taskFirst.Result);
+            encryptedUser.lastName  = Encoding.Unicode.GetString(taskLast.Result);
+            encryptedUser.country   = Encoding.Unicode.GetString(taskCountry.Result);
+            encryptedUser.city      = Encoding.Unicode.GetString(taskCity.Result);
+            encryptedUser.address   = Encoding.Unicode.GetString(taskAddress.Result); 
+            */
+            return encryptedUser;    
+        }
+
+
         public async Task<byte[]> Encrypt(byte[] bytesToEncypt, string password)
         {
             var taskResult = Task.Run(() =>
             {
                 var passwordHash = this.GeneratePasswordHash(password);
-
                 var key = this.GenerateKey(passwordHash);
-
                 var iv = this.GenerateIV(passwordHash);
-
                 ICryptoTransform Encryption = _algorithm.CreateEncryptor(key, iv);
                 return TransformBytes(Encryption, bytesToEncypt);
             });
@@ -47,11 +96,8 @@ namespace MarkedRound.HelpClasses
             var taskResult = Task.Run(() =>
             {
                 var passwordHash = this.GeneratePasswordHash(password);
-
                 var key = this.GenerateKey(passwordHash);
-
                 var iv = this.GenerateIV(passwordHash);
-
                 var Decrypt = _algorithm.CreateDecryptor(key, iv);
 
                 return TransformBytes(Decrypt, bytesToDecypt);
@@ -83,8 +129,8 @@ namespace MarkedRound.HelpClasses
                 using (var cryptoStream = new CryptoStream(bufferStream, transformer, CryptoStreamMode.Write))
                 {
                     cryptoStream.Write(bytesToTransform, 0, bytesToTransform.Length);
-                    cryptoStream.FlushFinalBlock();
-                    result = bufferStream.ToArray();
+                   cryptoStream.FlushFinalBlock();
+                   result = bufferStream.ToArray();
 
                     cryptoStream.Close();
                 }
@@ -136,12 +182,10 @@ namespace MarkedRound.HelpClasses
             var symmetricKey = rsa.Decrypt(Encrypted.EncryptedSymmetricKey, RSAEncryptionPadding.Pkcs1);
             var symmetrickIV = rsa.Decrypt(Encrypted.EncryptedSymmetricIV, RSAEncryptionPadding.Pkcs1);
             return new Asymmetric(symmetricKey, symmetrickIV);
-
         }
         public RSA rsaMakerAsym()
         {
             RSA rsa = RSA.Create();
-
             //use this
             X509Certificate2 certificate = LoadCertificate("MarketRound");
 
@@ -160,11 +204,6 @@ namespace MarkedRound.HelpClasses
             return certificate[0];
         }
     }
-
-
-    //makecert -n "CN=MarketRound" -a sha1 -pe -r -sr LocalMachine -ss MarketRoundCE -sky exchange
-
-
     public class Asymmetric
     {
         public Asymmetric(byte[] encryptedSymmetricKey, byte[] encryptedSymmetricIV)

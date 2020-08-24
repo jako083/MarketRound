@@ -18,8 +18,9 @@ namespace MarketRound.HelpClasses
                 int minSize = 20;
                 int maxSize = 25;
                 Random random = new Random();
-                int saltSize = random.Next(minSize, maxSize);
+                int saltSize = random.Next(minSize, maxSize); 
                 saltBytes = new byte[saltSize];
+               // saltBytes = new byte[15];
                 RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
                 rng.GetNonZeroBytes(saltBytes);
             }
