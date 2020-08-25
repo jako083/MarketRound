@@ -24,11 +24,12 @@ jobs:
       run: |
         npm install
         npm run build --if-present
+        npm run test --if-present
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'marketround'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_8e16a2dc7d244814a956d371d6176444 }}
-        package: './dist/MarketRound'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_b910269097004aa5945fa71a15078500 }}
+        package: .
