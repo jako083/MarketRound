@@ -31,4 +31,4 @@ jobs:
         app-name: 'marketround'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_8e16a2dc7d244814a956d371d6176444 }}
-        package: .
+        package: './dist/MarketRound'
