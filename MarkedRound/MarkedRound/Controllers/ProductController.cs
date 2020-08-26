@@ -7,10 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using MarketRound.Model;
 
 using static MarketRound.Controllers.MainController;
+using static MarkedRound.HelpClasses.CreateProduct;
+using static MarkedRound.HelpClasses.CreateComments;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using MarkedRound.Model;
+
 
 namespace MarkedRound.Controllers
 {
@@ -18,13 +21,18 @@ namespace MarkedRound.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        public List<ProductModel> Products(string _id)
+        public static List<ProductModel> Products(string _id, ObjectId? sellerId, ObjectId? commentId)
         {
             IMongoQueryable<ProductModel> usageQuery;
             var liste = new List<ProductModel>();
             //Either gets all products or just 1, depending on if _id is defined
-
-            if (_id == null)
+            if(sellerId != null && commentId != null)
+            {
+                usageQuery = from c in client.GetCollection<ProductModel>("products").AsQueryable()
+                             where c.sellerId == sellerId && c.commentId == commentId
+                             select c;
+            }
+            else if (_id == null)
             {
                 usageQuery = from c in client.GetCollection<ProductModel>("products").AsQueryable()
                              select c;
@@ -46,7 +54,7 @@ namespace MarkedRound.Controllers
         [HttpGet]
         public ActionResult Get()
         {
-            return Ok(Products(null));
+            return Ok(Products(null, null, null));
         }
 
         [HttpPost]
@@ -56,7 +64,7 @@ namespace MarkedRound.Controllers
             {
                 case "Search":
                     // Example: https://gyazo.com/f6e11a26e75e07d8c32e3607ef6ee63c
-                    var products = Products(null);
+                    var products = Products(null, null, null);
                     var Matches = products.Where(x => x.title.Contains(content.input.search, StringComparison.CurrentCultureIgnoreCase)
                                          || x.description.Contains(content.input.search, StringComparison.CurrentCultureIgnoreCase)
                                          || x.tags.Contains(content.input.search, StringComparer.OrdinalIgnoreCase)).ToList();
@@ -65,13 +73,17 @@ namespace MarkedRound.Controllers
                         Matches = AdvancedSearch(Matches, content.AdvancedSearch);
                     }
                     return Ok(Matches);
-                case "Test":
+                case "createOffer":
                     //Add more cases here when given
+                    ObjectId sellerId = GetAllUsers(content.createProduct.username, "Users").Result[0]._id;
+                    createOffer(content.createProduct, client, sellerId);
+                    //TODO
+                    //Change existing comment id with the newly created one, instead of using the template version
                     break;
             }
             return Ok();
         }
-
+        
 
         public List<ProductModel> AdvancedSearch(List<ProductModel> list, AdvancedSearchModel SearchOptions)
         {

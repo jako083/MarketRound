@@ -39,7 +39,7 @@ namespace MarketRound.HelpClasses
                         if (sortedList.Count >= 3)
                         {
                             //deny / ban
-                            ChangeUserInput(user.username, "Users", "loginBan", null, null, null, DateTime.Now.AddMinutes(5));
+                            ChangeUserInput(user.username, "Users", "loginBan", null, null, null, DateTime.Now.AddMinutes(5), null);
                             return $"Error! Account Temporary Locked until: {TimeZoneInfo.ConvertTimeFromUtc(Convert.ToDateTime(dbUser[0].loginBan), TimeZoneInfo.Local)}!";
                         }
                         else
@@ -52,7 +52,7 @@ namespace MarketRound.HelpClasses
                             else
                             {
                                 // Adds a failed login attemp to the DB if the user exists
-                                ChangeUserInput(user.username, "Users", "failedLoginTries", null, null, dbUser[0].failedLoginAttempts, null);
+                                ChangeUserInput(user.username, "Users", "failedLoginTries", null, null, dbUser[0].failedLoginAttempts, null, null);
                                 return "Error! Failed Login Attempt! : Wrong Password";
                             }
                         }

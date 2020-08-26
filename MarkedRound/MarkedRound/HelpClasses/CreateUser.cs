@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using MarketRound.Model;
 using MongoDB.Driver;
 using static MarketRound.HelpClasses.HashingSalting;
+using static MarketRound.Controllers.MainController;
 using MarkedRound.HelpClasses;
 
 namespace MarketRound.HelpClasses
@@ -19,7 +20,7 @@ namespace MarketRound.HelpClasses
         {
                try
                {
-                Encryptor _encrypter = new Encryptor("4556484548529632");
+                Encryptor _encrypter = new Encryptor(publicKey);
                 var Hashsalt = HashSaltValues(user.password, null);
                 user.password = Hashsalt.Pass;
                 var EncryptedUser =_encrypter.ObjectToEncryptDecrypt(user, Hashsalt.Salt, "Encrypt");
@@ -28,7 +29,7 @@ namespace MarketRound.HelpClasses
             var currentTime = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
                 var newUser = new BsonDocument
                 {
-                    {"username", EncryptedUser.username },
+                    {"username", user.username },
                     {"password", EncryptedUser.password },
                     {"salt", Hashsalt.Salt },
                     {"firstName", EncryptedUser.firstName },

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarketRound.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,15 +8,18 @@ namespace MarkedRound.Model
 {
     public class ProductPostModel
     {
-        public ProductPostModel(string section, ProductPost_Input input)
+        public ProductPostModel(string section, ProductPost_Input input, AdvancedSearchModel advancedSearchModel, CreateProductModel createProduct)
         {
             this.section = section;
             this.input = input;
+            this.AdvancedSearch = advancedSearchModel;
+            this.createProduct = createProduct;
         }
 
         public string section { get; set; }
         public ProductPost_Input input { get; set; }
         public AdvancedSearchModel AdvancedSearch { get; set; }
+        public CreateProductModel createProduct { get; set; }
     }
 
     public class ProductPost_Input

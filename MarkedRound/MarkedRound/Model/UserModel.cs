@@ -12,21 +12,21 @@ namespace MarketRound.Model
         public UserModel(ObjectId id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, int?[] ongoingSales, int?[] salesHistory, int?[] reviews, List<DateTime> failedLoginAttempts, string loginBan, DateTime creationDate)
         {
             _id = id;
-            this.username = username;
-            this.password = password;
-            this.salt = salt;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.phoneNumber = phoneNumber;
-            this.country = country;
-            this.city = city;
-            this.address = address;
-            this.ongoingSales = ongoingSales;
-            this.salesHistory = salesHistory;
-            this.reviews = reviews;
-            this.failedLoginAttempts = failedLoginAttempts;
-            this.loginBan = loginBan;
-            this.creationDate = creationDate;
+           this.username = username;
+           this.password = password;
+           this.salt = salt;
+           this.firstName = firstName;
+           this.lastName = lastName;
+           this.phoneNumber = phoneNumber;
+           this.country = country;
+           this.city = city;
+           this.address = address;
+           this.ongoingSales = ongoingSales;
+           this.salesHistory = salesHistory;
+           this.reviews = reviews;
+           this.failedLoginAttempts = failedLoginAttempts;
+           this.loginBan = loginBan;
+           this.creationDate = creationDate;
         }
 
         public ObjectId _id { get; set; }

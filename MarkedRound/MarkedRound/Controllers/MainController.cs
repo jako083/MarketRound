@@ -43,8 +43,14 @@ namespace MarketRound.Controllers
     public class MainController : ControllerBase
     {
         //Database Connection
-        public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
+        //Online:
+        public static IMongoDatabase client = new MongoClient($@"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?&retrywrites=false").GetDatabase("silkevejen");
+        
+        // Local:
+        // public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
 
+        public static readonly string publicKey = "4556484548529632";
+        public static readonly string collection = "users";
         public static async Task<List<UserModel>> GetAllUsers(string username, string section)
        // public static List<UserModel> GetAllUsers(string username, string section)
         {
@@ -55,9 +61,9 @@ namespace MarketRound.Controllers
             try
             {
                 var ListOfUsers = new List<UserModel>();
+                
                 await Task.Run(() =>
                 {
-
                     IMongoQueryable<UserModel> usageQuery;
                     if (username == null)
                     {
@@ -72,19 +78,18 @@ namespace MarketRound.Controllers
                                      where c.username == username
                                      select c;
                     }
-                    Encryptor _encrypter = new Encryptor("4556484548529632");
+                    Encryptor _encrypter = new Encryptor(publicKey);
 
                     foreach (var item in usageQuery)
                     {
-                        //    var encrypt = Task.Run(() => _encrypter.Encrypt(Encoding.Default.GetBytes(item);
-                        var test = _encrypter.ObjectToEncryptDecrypt(item, item.salt, "Decrypt");
-                      ListOfUsers.Add( test);
+                        // Decrypts user information to readable text
+                        var decryptedUsers = _encrypter.ObjectToEncryptDecrypt(item, item.salt, "Decrypt");
+                      ListOfUsers.Add(decryptedUsers);
 
                     }
-                 //   ListOfUsers.AddRange(usageQuery);
                 });
+                
                 return ListOfUsers;
-
             }
             catch
             {
@@ -96,14 +101,14 @@ namespace MarketRound.Controllers
         [HttpGet]
         public ActionResult Get()
         {
-            return Ok(GetAllUsers(null, "Users").Result);
+            return Ok(GetAllUsers(null, collection).Result);
         }
 
         // GET api/<MainController>/5
         [HttpGet("{username}")]
         public ActionResult Get(string username)
         {
-            return Ok(GetAllUsers(username, "Users").Result);
+            return Ok(GetAllUsers(username, collection).Result);
         }
 
         // POST api/<MainController>
@@ -113,7 +118,7 @@ namespace MarketRound.Controllers
             switch (user.section)
             {
                 case "createUser":
-                    var result = CreateUserSecton("Users", user.userContent, client);
+                    var result = CreateUserSecton(collection, user.userContent, client);
                     if (result != "Success")
                     {
                         //Exception error
@@ -122,37 +127,49 @@ namespace MarketRound.Controllers
                     return Ok(result);
                 case "login":
                     // Example: https://gyazo.com/ceb108a3cf4755b641828e5d445b152c
-                    var dbUser = GetAllUsers(user.userContent.username, "Users");
+                    var dbUser = GetAllUsers(user.userContent.username, collection);
+                    if (dbUser.Result.Count > 0)
                     return Ok(login(user.userContent, dbUser.Result));
-                default:
-                    return Ok("Error! Null / Empty / Non existing section detected");
+                    break;
+                
             }
+            return Ok("Error! Null / Empty / Non existing section detected");
         }
 
+        
         // PUT api/<MainController>/5
         [HttpPut]
         public ActionResult Put([FromBody] ChangeUserModel changeUser)
         {
+            //data validation
             if (changeUser.key.Length != changeUser.change.Length || changeUser.dataType.Length != changeUser.key.Length)
                 return Ok("Missing Input");
             try
             {
-                var result = false;
-                for (int i = 0; i < changeUser.key.Length; i++)
+                //change user section
+                var DBUser = GetAllUsers(changeUser.username, collection).Result;
+                if (DBUser.Count > 0)
                 {
-                    switch (changeUser.dataType[i])
+                    string saltKey = DBUser[0].salt;
+                    var result = false;
+                    for (int i = 0; i < changeUser.key.Length; i++)
                     {
-                        case "string":
-                            result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null);
-                            break;
-                        case "int":
-                            result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null);
-                            break;
-                        default:
-                            break;
+                        switch (changeUser.dataType[i])
+                        {
+                            case "string":
+                                result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null, saltKey);
+                                break;
+                            case "int":
+                                result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null, saltKey);
+                                break;
+                            default:
+                                break;
+                        }
                     }
+                    return Ok(result);
                 }
-                return Ok(result);
+                return Ok("Error! Non existing user detected!");
+
             }
             catch
             {
@@ -165,10 +182,11 @@ namespace MarketRound.Controllers
         public ActionResult Delete(string username)
         {
             try {
-                var collection = client.GetCollection<BsonDocument>("Users");
+                //delete user
+                var DBcollection = client.GetCollection<BsonDocument>(collection);
                 var deletefilter = Builders<BsonDocument>.Filter.Eq("username", username);
 
-                collection.DeleteOne(deletefilter);
+                DBcollection.DeleteOne(deletefilter);
                 return Ok("Success");
             }
             catch
