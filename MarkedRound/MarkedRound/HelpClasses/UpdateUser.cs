@@ -12,7 +12,7 @@ namespace MarketRound.HelpClasses
 {
     public class UpdateUser
     {
-        public static bool ChangeUserInput(string username, string collection, string Document, string StrInput, int? IntInput, List<DateTime> failedLoginAttemps, DateTime? loginBan, string saltKey)
+        public static bool ChangeUserInput(string username, string collection, string Document, string StrInput, int? IntInput, List<DateTime> failedLoginAttemps, DateTime? loginBan, string saltKey, ObjectId? _id, string Case)
         {
             try
             {
@@ -26,24 +26,44 @@ namespace MarketRound.HelpClasses
                 FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("username", username);
                 
                 UpdateDefinition<BsonDocument> update;
-                if (StrInput != null)
-                {
-                    // Used for when a string value is given
-                    Encryptor _encryptor = new Encryptor(publicKey);
-                    var task = Task.Run(() => _encryptor.Encrypt(Encoding.UTF8.GetBytes(StrInput), saltKey));
-                    Task.WaitAll();
+                Encryptor _encryptor = new Encryptor(publicKey);
 
-                    update = Builders<BsonDocument>.Update.Set(Document, Convert.ToBase64String(task.Result));
-                }
-                else if (failedLoginAttemps != null)
+                switch (Case)
                 {
-                    // Used for failed login attempts
-                    update = Builders<BsonDocument>.Update.Set(Document, failedLoginAttemps);
-                }
-                else
-                {
-                    // Used for when an int value is given
-                    update = Builders<BsonDocument>.Update.Set(Document, IntInput);
+                    case "ChangeUserStr":
+                        // Used for when a string value is given
+                        var taskStr = Task.Run(() => _encryptor.Encrypt(Encoding.UTF8.GetBytes(StrInput), saltKey));
+                        Task.WaitAll();
+                        update = Builders<BsonDocument>.Update.Set(Document, Convert.ToBase64String(taskStr.Result));
+                    break;
+
+                    case "ChangeUserInt":
+                        // Used for when an int value is given
+                        update = Builders<BsonDocument>.Update.Set(Document, IntInput);
+                    break;
+
+                    case "LoginBan":
+                        //        ChangeUserInput(user.username, "Users", "loginBan", null, null, null, DateTime.Now.AddMinutes(5), null, null, "LoginBan");
+                        update = Builders<BsonDocument>.Update.Set(Document, loginBan.ToString());
+                        break;
+
+                    case "failedLoginTries":
+                        // Used for failed login attempts
+                        update = Builders<BsonDocument>.Update.Set(Document, failedLoginAttemps);
+                        break;
+
+                    case "ChangeProductCommentId":
+                        //Used for when creating new products
+                        filter = Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(username));
+                        update = Builders<BsonDocument>.Update.Set(Document, _id);
+                        break;
+                    case "AddProductToUser":
+                        filter = Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(username));
+                        update = Builders<BsonDocument>.Update.Push(Document, _id);
+                        break;
+
+                    default:
+                        return false;
                 }
                 BsonColl.UpdateOne(filter, update);
                 return true;

@@ -18,7 +18,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 
 using static MarketRound.HelpClasses.UpdateUser;
-using static MarketRound.HelpClasses.CreateUser;
+using static MarketRound.HelpClasses.CreateNew;
 using static MarketRound.HelpClasses.LoginClasses;
 using MarkedRound.Model;
 using MarkedRound.HelpClasses;
@@ -34,7 +34,7 @@ using System.Text;
  * Update Method:  ChangeUserInput(id, Document, StrInput, IntInput, collection)
  * Exempel: ChangeUserInput(1, "PhoneNumber", null, 6666, "Users");
  * 
- * Add new User method: CreateUserSecton(Collection, UserModel, DBClient);
+ * Add new User method: CreateNewSecton(Collection, UserModel, DBClient);
  */
 namespace MarketRound.Controllers
 {
@@ -44,10 +44,10 @@ namespace MarketRound.Controllers
     {
         //Database Connection
         //Online:
-        public static IMongoDatabase client = new MongoClient($@"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?&retrywrites=false").GetDatabase("silkevejen");
+      //  public static IMongoDatabase client = new MongoClient($@"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?&retrywrites=false").GetDatabase("silkevejen");
         
         // Local:
-        // public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
+         public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
 
         public static readonly string publicKey = "4556484548529632";
         public static readonly string collection = "users";
@@ -117,8 +117,8 @@ namespace MarketRound.Controllers
         {
             switch (user.section)
             {
-                case "createUser":
-                    var result = CreateUserSecton(collection, user.userContent, client);
+                case "CreateNew":
+                    var result = CreateNewSecton(collection, user.userContent, client);
                     if (result != "Success")
                     {
                         //Exception error
@@ -131,11 +131,13 @@ namespace MarketRound.Controllers
                     if (dbUser.Result.Count > 0)
                     return Ok(login(user.userContent, dbUser.Result));
                     break;
-                
+                case "GetAllProductsFromUser":
+                    dbUser = GetAllUsers(user.userContent.username, collection);
+                    //dbUser.Result[0].
+                    break;
             }
             return Ok("Error! Null / Empty / Non existing section detected");
         }
-
         
         // PUT api/<MainController>/5
         [HttpPut]
@@ -157,10 +159,10 @@ namespace MarketRound.Controllers
                         switch (changeUser.dataType[i])
                         {
                             case "string":
-                                result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null, saltKey);
+                                result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], changeUser.change[i], null, null, null, saltKey, null, "ChangeUserStr");
                                 break;
                             case "int":
-                                result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null, saltKey);
+                                result = ChangeUserInput(changeUser.username, changeUser.collection, changeUser.key[i], null, Convert.ToInt32(changeUser.change[i]), null, null, saltKey, null, "ChangeUserInt");
                                 break;
                             default:
                                 break;
@@ -169,7 +171,6 @@ namespace MarketRound.Controllers
                     return Ok(result);
                 }
                 return Ok("Error! Non existing user detected!");
-
             }
             catch
             {

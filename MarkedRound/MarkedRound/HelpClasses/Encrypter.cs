@@ -23,8 +23,10 @@ namespace MarkedRound.HelpClasses
                 throw new NullReferenceException();
             _salt = Convert.FromBase64String(salt);
 
-            _algorithm = new AesManaged();
-            _algorithm.Padding = PaddingMode.Zeros;
+            _algorithm = new AesManaged
+            {
+                Padding = PaddingMode.Zeros
+            };
         }
         public UserModel ObjectToEncryptDecrypt(UserModel user, string saltPass, string section)
         {
@@ -186,10 +188,12 @@ namespace MarkedRound.HelpClasses
             //use this
             X509Certificate2 certificate = LoadCertificate("MarketRound");
 
-            RSAParameters rsaKeyInfo = new RSAParameters();
-            rsaKeyInfo.Modulus = modulus;
             byte[] exponent = { 1, 0, 1 };
-            rsaKeyInfo.Exponent = exponent;
+            RSAParameters rsaKeyInfo = new RSAParameters
+            {
+                Modulus = modulus,
+                Exponent = exponent
+            };
             rsa.ImportParameters(rsaKeyInfo);
             return rsa;
         }

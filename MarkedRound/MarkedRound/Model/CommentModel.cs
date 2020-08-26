@@ -8,9 +8,9 @@ namespace MarkedRound.Model
 {
     public class CommentModel
     {
-        public CommentModel(ObjectId _id, ObjectId productId, ObjectId sellerId, Comments comments)
+        public CommentModel(ObjectId id, ObjectId productId, ObjectId sellerId, Comments[] comments)
         {
-            this._id = _id;
+            _id = id;
             this.productId = productId;
             this.sellerId = sellerId;
             this.comments = comments;
@@ -19,7 +19,7 @@ namespace MarkedRound.Model
         public ObjectId _id { get; set; }
         public ObjectId productId { get; set; }
         public ObjectId sellerId { get; set; }
-        public Comments comments { get; set; }
+        public Comments[] comments { get; set; }
     }
 
     public class Comments

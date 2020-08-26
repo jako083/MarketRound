@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MarketRound.Model;
-
-using static MarketRound.Controllers.MainController;
-using static MarkedRound.HelpClasses.CreateProduct;
-using static MarkedRound.HelpClasses.CreateComments;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using MarkedRound.Model;
+using MarketRound.HelpClasses;
+
+using static MarketRound.Controllers.MainController;
+using static MarketRound.HelpClasses.CreateNew;
 
 
 namespace MarkedRound.Controllers
@@ -21,6 +21,7 @@ namespace MarkedRound.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
+        public static readonly string collection = "products";
         public static List<ProductModel> Products(string _id, ObjectId? sellerId, ObjectId? commentId)
         {
             IMongoQueryable<ProductModel> usageQuery;
@@ -43,13 +44,9 @@ namespace MarkedRound.Controllers
                              where c._id == ObjectId.Parse(_id)
                              select c;
             }
-
-
-
             liste.AddRange(usageQuery);
             return liste;
         }
-
 
         [HttpGet]
         public ActionResult Get()
@@ -74,17 +71,16 @@ namespace MarkedRound.Controllers
                     }
                     return Ok(Matches);
                 case "createOffer":
-                    //Add more cases here when given
                     ObjectId sellerId = GetAllUsers(content.createProduct.username, "Users").Result[0]._id;
                     createOffer(content.createProduct, client, sellerId);
-                    //TODO
-                    //Change existing comment id with the newly created one, instead of using the template version
+                    break;
+                case "Purchase":
+
                     break;
             }
             return Ok();
         }
-        
-
+        #region advancedSearch
         public List<ProductModel> AdvancedSearch(List<ProductModel> list, AdvancedSearchModel SearchOptions)
         {
             //Alternatively use a switch?
@@ -113,6 +109,25 @@ namespace MarkedRound.Controllers
 
             return list;
         }
+        #endregion
 
+        [HttpDelete]
+        public ActionResult Delete([FromBody] int _id)
+        {
+            try
+            {
+                //delete user
+                var DBcollection = client.GetCollection<BsonDocument>(collection);
+                var deletefilter = Builders<BsonDocument>.Filter.Eq("_id", _id);
+
+                DBcollection.DeleteOne(deletefilter);
+                return Ok();
+            }
+            catch 
+            {
+
+                return Ok("Error");
+            }
+        }
     }
 }

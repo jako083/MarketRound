@@ -9,7 +9,7 @@ namespace MarketRound.Model
 {
     public class UserModel
     {
-        public UserModel(ObjectId id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, int?[] ongoingSales, int?[] salesHistory, int?[] reviews, List<DateTime> failedLoginAttempts, string loginBan, DateTime creationDate)
+        public UserModel(ObjectId id, string username, string password, string salt, string firstName, string lastName, int phoneNumber, string country, string city, string address, ObjectId?[] ongoingSales, int?[] salesHistory, int?[] reviews, List<DateTime> failedLoginAttempts, string loginBan, DateTime creationDate)
         {
             _id = id;
            this.username = username;
@@ -39,7 +39,7 @@ namespace MarketRound.Model
         public string country { get; set; }
         public string city { get; set; }
         public string address { get; set; }
-        public int?[] ongoingSales { get; set; }
+        public ObjectId?[] ongoingSales { get; set; }
         public int?[] salesHistory { get; set; }
         public int?[] reviews { get; set; }
         public List<DateTime> failedLoginAttempts {get;set;}

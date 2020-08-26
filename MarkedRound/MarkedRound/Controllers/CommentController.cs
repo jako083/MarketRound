@@ -17,7 +17,7 @@ namespace MarkedRound.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
-        public List<CommentModel> Products(string _id)
+        public List<CommentModel> Comments(string _id)
         {
             IMongoQueryable<CommentModel> usageQuery;
             var liste = new List<CommentModel>();
@@ -38,6 +38,11 @@ namespace MarkedRound.Controllers
             return liste;
         }
 
-       
+        [HttpGet]
+        public ActionResult Get()
+        {
+            return Ok(Comments(null));
+        }
+
     }
 }
