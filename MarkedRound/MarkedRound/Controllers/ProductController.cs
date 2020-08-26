@@ -71,7 +71,7 @@ namespace MarkedRound.Controllers
                     }
                     return Ok(Matches);
                 case "createOffer":
-                    ObjectId sellerId = GetAllUsers(content.createProduct.username, "Users").Result[0]._id;
+                    ObjectId sellerId = GetAllUsers(content.createProduct.username, "users").Result[0]._id;
                     createOffer(content.createProduct, client, sellerId);
                     break;
                 case "Purchase":

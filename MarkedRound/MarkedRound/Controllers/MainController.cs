@@ -20,6 +20,8 @@ using System.Globalization;
 using static MarketRound.HelpClasses.UpdateUser;
 using static MarketRound.HelpClasses.CreateNew;
 using static MarketRound.HelpClasses.LoginClasses;
+using static MarkedRound.Controllers.ProductController;
+
 using MarkedRound.Model;
 using MarkedRound.HelpClasses;
 using System.Text;
@@ -118,23 +120,28 @@ namespace MarketRound.Controllers
             switch (user.section)
             {
                 case "CreateNew":
+                    //Used to creation of new users
                     var result = CreateNewSecton(collection, user.userContent, client);
                     if (result != "Success")
                     {
-                        //Exception error
                         return Ok(result);
                     }
                     return Ok(result);
                 case "login":
+                    // Used for login authentication, which uses both salting and decryption of encrypted hashvalue 
+                    // hashvalue will still return hashed, but it gets encrypted, so we also decrypt it to the original hash value
                     // Example: https://gyazo.com/ceb108a3cf4755b641828e5d445b152c
                     var dbUser = GetAllUsers(user.userContent.username, collection);
                     if (dbUser.Result.Count > 0)
-                    return Ok(login(user.userContent, dbUser.Result));
+                        return Ok(login(user.userContent, dbUser.Result));
                     break;
                 case "GetAllProductsFromUser":
+                    // Returns list of all user's products which they have listed as ongoing sale by using their username, 
+                    // then converts it to _id, then uses that to match the product creator by _id
                     dbUser = GetAllUsers(user.userContent.username, collection);
-                    //dbUser.Result[0].
-                    break;
+                    List<ProductModel> ongoingSales = new List<ProductModel>();
+                    dbUser.Result[0].ongoingSales.ToList().ForEach(x => ongoingSales.Add(Products(null, x, null)[0]));
+                    return Ok(ongoingSales);
             }
             return Ok("Error! Null / Empty / Non existing section detected");
         }
