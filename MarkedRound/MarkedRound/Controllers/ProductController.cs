@@ -10,10 +10,8 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using MarkedRound.Model;
 using MarketRound.HelpClasses;
-
 using static MarketRound.Controllers.MainController;
 using static MarketRound.HelpClasses.CreateNew;
-
 
 namespace MarkedRound.Controllers
 {
@@ -111,14 +109,15 @@ namespace MarkedRound.Controllers
         }
         #endregion
 
-        [HttpDelete]
-        public ActionResult Delete([FromBody] int _id)
+        [HttpDelete("{_id}")]
+        public ActionResult Delete( string _id)
         {
             try
             {
-                //delete user
+                var deleteId = ObjectId.Parse(_id);
+                //delete product
                 var DBcollection = client.GetCollection<BsonDocument>(collection);
-                var deletefilter = Builders<BsonDocument>.Filter.Eq("_id", _id);
+                var deletefilter = Builders<BsonDocument>.Filter.Eq("_id", deleteId);
 
                 DBcollection.DeleteOne(deletefilter);
                 return Ok();

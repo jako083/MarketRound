@@ -46,10 +46,10 @@ namespace MarketRound.Controllers
     {
         //Database Connection
         //Online:
-      //  public static IMongoDatabase client = new MongoClient($@"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?&retrywrites=false").GetDatabase("silkevejen");
+        public static IMongoDatabase client = new MongoClient($@"mongodb://markedround:ssJnR833qFMonYSH6h3iYXwiCGGQ06SgvbPW72LKstejR1lGUWtCy5eZG7qzNPO00xVKhiC5jNVUo8oUge5p6Q==@markedround.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@markedround@?&retrywrites=false").GetDatabase("silkevejen");
         
         // Local:
-         public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
+      //   public static IMongoDatabase client = new MongoClient($"mongodb://{"adminUser"}:{"silvereye"}@localhost:27017").GetDatabase("silkevejen");
 
         public static readonly string publicKey = "4556484548529632";
         public static readonly string collection = "users";
