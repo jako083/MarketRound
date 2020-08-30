@@ -18,7 +18,7 @@ jobs:
     - name: Set up .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.102'
+        dotnet-version: '2.1.804'
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
@@ -31,5 +31,5 @@ jobs:
       with:
         app-name: 'apimarketround'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_9ad35e3b95db48f0960288851304bc55 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5809e2f6c3384a90bb75cfc3bf9c261e }}
         package: ${{env.DOTNET_ROOT}}/myapp 
